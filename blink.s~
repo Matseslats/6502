@@ -1,0 +1,68 @@
+PORTB = $6000  ; Adresse til B pinnene
+PORTA = $6001  ; Adresse til A pinnene
+DDRB = $6002  ; Data retnings register A
+DDRA = $6003  ; Data retnings register B
+
+E  = %10000000 ; Enable - Top bit
+RW = %01000000 ; Read Write
+RS = %00100000 ; Register select
+
+  .org $8000
+
+reset:
+  lda #%11111111  ; Sett alle pinnene på port b til utganger
+  sta DDRB
+
+  lda #%11100000  ; Set de første tre pinnene på port b til utganger
+  sta DDRA  
+
+  lda #%00111000  ; Funksjon sett - 8 bit; 2 linjer; 5x8p font
+  sta PORTB
+
+  lda #0	  ; Sett RS/RW/E bits til 0
+  sta PORTA
+
+  lda #E	  ; Slå på Enable signalet for å sende instruksjonen
+  sta PORTA
+
+  lda #0          ; Sett RS/RW/E bits til 0
+  sta PORTA                                    
+
+  lda #%00001110  ; Skjerm på; mus på; blink av
+  sta PORTB
+
+  lda #0	  ; Sett RS/RW/E bits til 0
+  sta PORTA
+
+  lda #E	  ; Slå på Enable signalet for å sende instruksjonen
+  sta PORTA
+
+  lda #0          ; Sett RS/RW/E bits til 0
+  sta PORTA                                    
+
+  lda #%00000110  ; Flytt mus til høyre hver gang; ikke flytt hele displayet
+  sta PORTB
+
+  lda #0	  ; Sett RS/RW/E bits til 0
+  sta PORTA
+
+  lda #E	  ; Slå på Enable signalet for å sende instruksjonen
+  sta PORTA
+
+  lda #0          ; Sett RS/RW/E bits til 0
+  sta PORTA                                    
+
+  lda #"H"
+  sta PORTB
+
+
+
+loop:
+  ror
+  sta $6000
+
+  jmp loop
+
+  .org $fffc
+  .word reset
+  .word $0000
